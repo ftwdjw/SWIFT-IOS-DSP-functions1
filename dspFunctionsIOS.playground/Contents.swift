@@ -1,6 +1,5 @@
 //: Playground - noun: a place where people can play
-//This IOS playground is intended to be a reference for DSP functions in the
-//Accelerate framework. A struct is used for vectors and matrices definition.
+//This IOS playground is intended to be a reference for DSP functions in the Accelerate framework. A struct is used for vectors and matrices definition.
 
 
 //5/31/2016
