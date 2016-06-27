@@ -68,6 +68,8 @@ func plotArrayInPlayground<T>(arrayToPlot:Array<T>, title:String) {
     }
 }
 
+//: ![absolute value of a vector](vdsp_81_2x.png)
+
 func abs (a: [Double]) -> [Double] {
     //Vector absolute values; double precision.
     var result = [Double](count:a.count, repeatedValue:0.0)
@@ -351,6 +353,7 @@ func gauss(a:Matrix)->[Double]{
     var i :Int
     
     for(i=n-1; i>=0; i -= 1){
+        print("i=/(i)")
         sum=0.0
         
         for j in i+1..<rows{
