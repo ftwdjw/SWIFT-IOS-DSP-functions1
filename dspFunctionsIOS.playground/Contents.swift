@@ -3,6 +3,7 @@
 
 
 //5/31/2016
+// 9 8 2016 fixed for xcode 8
 import UIKit
 import Accelerate
 import XCPlayground
@@ -16,18 +17,18 @@ public struct Vector {
     var grid=[Double]()
     init(rows: Int) {
         self.rows = rows
-        grid = Array(count: rows, repeatedValue: 0.0)
+        grid = Array(repeating: 0.0, count: rows)
     }
     func indexIsValid(row: Int) -> Bool {
         return row >= 0 && row < rows
     }
     subscript(row: Int) -> Double {
         get {
-            assert(indexIsValid(row), "Index out of range")
+            assert(indexIsValid(row: row), "Index out of range")
             return grid[row]
         }
         set {
-            assert(indexIsValid(row), "Index out of range")
+            assert(indexIsValid(row: row), "Index out of range")
             grid[row] = newValue
         }
     }
@@ -41,7 +42,7 @@ public struct Matrix {
     init(rows: Int, columns: Int) {
         self.rows = rows
         self.columns = columns
-        grid = Array(count: rows * columns, repeatedValue: 0.0)
+        grid = Array(repeating: 0.0, count: rows * columns)
     }
     
     func indexIsValidForRow(row: Int, column: Int) -> Bool {
@@ -50,11 +51,11 @@ public struct Matrix {
     
     subscript(row: Int, column: Int) -> Double {
         get {
-            assert(indexIsValidForRow(row,column: column), "Index out of range")
+            assert(indexIsValidForRow(row: row,column: column), "Index out of range")
             return grid[(row * columns) + column]
         }
         set {
-            assert(indexIsValidForRow(row, column: column), "Index out of range")
+            assert(indexIsValidForRow(row: row, column: column), "Index out of range")
             grid[(row * columns) + column] = newValue
         }
     }
@@ -64,7 +65,7 @@ public struct Matrix {
 // A little playground helper function
 func plotArrayInPlayground<T>(arrayToPlot:Array<T>, title:String) {
     for currentValue in arrayToPlot {
-        XCPCaptureValue(title, value: currentValue)
+        XCPCaptureValue(identifier: title, value: currentValue)
     }
 }
 
@@ -72,7 +73,7 @@ func plotArrayInPlayground<T>(arrayToPlot:Array<T>, title:String) {
 
 func abs (a: [Double]) -> [Double] {
     //Vector absolute values; double precision.
-    var result = [Double](count:a.count, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:a.count)
     vDSP_vabsD(a, 1,&result, 1, UInt(a.count))
     return result
 }
@@ -82,21 +83,21 @@ func ramp (initial_value: Double, increment: Double, numberOfSteps:Int) -> [Doub
     var aa = initial_value
     var bb=increment
     
-    var result = [Double](count:numberOfSteps, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:numberOfSteps)
     vDSP_vrampD(&aa, &bb, &result, 1, UInt(result.count))
     return result
 }
 
 func neg (a: [Double]) -> [Double] {
     //Computes the squared values of vector A and leaves the result in vector C; double precision.
-    var result = [Double](count:a.count, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:a.count)
     vDSP_vnegD(a, 1,&result, 1, UInt(a.count))
     return result
 }
 
 func sq (a: [Double]) -> [Double] {
     //Computes the squared values of vector A and leaves the result in vector C; double precision.
-    var result = [Double](count:a.count, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:a.count)
     vDSP_vsqD(a, 1,&result, 1, UInt(a.count))
     return result
 }
@@ -106,14 +107,14 @@ func normalize (a: [Double]) -> (out:[Double], mean1:Double, std:Double) {
     var mean = 0.0
     var standardDeviation = 0.0
     
-    var result = [Double](count:a.count, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:a.count)
     vDSP_normalizeD(a, 1,&result, 1, &mean, &standardDeviation, UInt(a.count))
     return (out:result, mean1:mean, std:standardDeviation)
 }
 
 func polar (a: [Double]) -> [Double] {
     //Converts rectangular coordinates to polar coordinates. Cartesian (x,y) pairs are read from vector A. Polar (rho, theta) pairs, where rho is the radius(magnitude) and theta is the angle in radians in the range [-pi, pi] are written to vector C. N specifies the number of coordinate pairs in A and C. Coordinate pairs are adjacent elements in the array, regardless of stride; stride is the distance from one coordinate pair to the next.
-    var result = [Double](count:a.count, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:a.count)
     vDSP_polarD(a,2,&result,2, UInt(a.count/2))
     return result
 }
@@ -121,7 +122,7 @@ func polar (a: [Double]) -> [Double] {
 func rect (a: [Double]) -> [Double] {
     //Converts polar coordinates to rectangular coordinates. Polar (rho, theta) pairs, where rho is the radius and theta is the angle in the range [-pi, pi] are read from vector A. Cartesian (x,y) pairs are written to vector C. N specifies the number of coordinate pairs in A and C.
     //Coordinate pairs are adjacent elements in the array, regardless of stride; stride is the distance from one coordinate pair to the next.
-    var result = [Double](count:a.count, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:a.count)
     vDSP_rectD(a, 2,&result, 2, UInt(a.count/2))
     return result
 }
@@ -131,7 +132,7 @@ func add (a: [Double], b: [Double]) -> [Double] {
 
     assert(a.count == b.count, "Expected arrays of the same length, instead got arrays of two different lengths")
     
-    var result = [Double](count:a.count, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:a.count)
     vDSP_vaddD(a, 1, b, 1, &result, 1, UInt(a.count))
     return result
 }
@@ -148,7 +149,7 @@ func sub (a: [Double], b: [Double]) -> [Double] {
     
     assert(a.count == b.count, "Expected arrays of the same length, instead got arrays of two different lengths")
     
-    var result = [Double](count:a.count, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:a.count)
     vDSP_vsubD(a, 1, b, 1, &result, 1, UInt(a.count))
     return result
 }
@@ -156,7 +157,7 @@ func sub (a: [Double], b: [Double]) -> [Double] {
 func mul (a: [Double], b: [Double]) -> [Double] {
     //This function multiplies the first N elements of A by corresponding elements of B, leaving the result in C.
     assert(a.count == b.count, "Expected arrays of the same length, instead got arrays of two different lengths")
-    var result = [Double](count:a.count, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:a.count)
     vDSP_vmulD(a, 1, b, 1, &result, 1, UInt(a.count))
     return result
 }
@@ -164,7 +165,7 @@ func mul (a: [Double], b: [Double]) -> [Double] {
 func div (a: [Double], b: [Double]) -> [Double] {
     //This function divides the first N elements of A by corresponding elements of B, leaving the result in C.
     assert(a.count == b.count, "Expected arrays of the same length, instead got arrays of two different lengths")
-    var result = [Double](count:a.count, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:a.count)
     vDSP_vdivD(a, 1, b, 1, &result, 1, UInt(a.count))
     return result
 }
@@ -184,14 +185,14 @@ func transpose (a: Matrix ) -> [Double] {
     let columns=a.columns
     var a1=[Double]()
     var count=0
-    a1 = [Double](count:rows*columns, repeatedValue:0.0)
+    a1 = [Double](repeating:0.0, count:rows*columns)
     for i in 0..<columns{
         for j in 0..<rows{
              print("\(count)")
             a1[count]=a[i,j]
             count += 1
     } }
-    var result = [Double](count:rows*columns, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:rows*columns)
     vDSP_mtransD(a1, 1, &result, 1, UInt(rows),UInt(columns))
     return result
 }
@@ -208,7 +209,7 @@ func mmul (a: Matrix, b: Matrix) -> [Double]{
     var b1=[Double]()
     var count=0
     
-    a1 = [Double](count:rows*columns, repeatedValue:0.0)
+    a1 = [Double](repeating:0.0, count:rows*columns)
     for i in 0..<columns{
         for j in 0..<rows{
             print("\(count)")
@@ -218,7 +219,7 @@ func mmul (a: Matrix, b: Matrix) -> [Double]{
     }
     print("\(a1)")
     
-    b1 = [Double](count:rows*columns, repeatedValue:0.0)
+    b1 = [Double](repeating:0.0, count:rows*columns)
     
     count=0
     for i in 0..<columns{
@@ -230,7 +231,7 @@ func mmul (a: Matrix, b: Matrix) -> [Double]{
     }
     print("\(b1)")
     
-    var result = [Double](count:rows*columns, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:rows*columns)
     //func vDSP_mmulD(_ __A: UnsafePointer<Double>, _ __IA: vDSP_Stride, _ __B: UnsafePointer<Double>, _ __IB: vDSP_Stride, _ __C: UnsafeMutablePointer<Double>, _ __IC: vDSP_Stride, _ __M: vDSP_Length, _ __N: vDSP_Length, _ __P: vDSP_Length)
     
     vDSP_mmulD(a1, 1, b1, 1, &result,1, UInt(rows),UInt(columns1),UInt(rows))
@@ -241,7 +242,7 @@ func mmul (a: Matrix, b: Matrix) -> [Double]{
 func distance (a: [Double], b: [Double]) -> [Double] {
 //For the first N elements of A and B, this function takes the square root of the sum of the squares of corresponding elements, leaving the results in C. Vector distance; double precision.
     assert(a.count == b.count, "Expected arrays of the same length, instead got arrays of two different lengths")
-    var result = [Double](count:a.count, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:a.count)
     vDSP_vdistD(a, 1, b, 1, &result, 1, UInt(a.count))
     return result
 }
@@ -257,7 +258,7 @@ func mvmul (a: Matrix, b: Vector) -> [Double]{
     var b1=[Double]()
     var count=0
     
-    a1 = [Double](count:rows*columns, repeatedValue:0.0)
+    a1 = [Double](repeating:0.0, count:rows*columns)
     for i in 0..<columns{
         for j in 0..<rows{
             print("\(count)")
@@ -267,7 +268,7 @@ func mvmul (a: Matrix, b: Vector) -> [Double]{
     }
     print("\(a1)")
     
-    b1 = [Double](count:rows1, repeatedValue:0.0)
+    b1 = [Double](repeating:0.0, count:rows1)
     
     count=0
     for i in 0..<rows1{
@@ -277,7 +278,7 @@ func mvmul (a: Matrix, b: Vector) -> [Double]{
     }
     print("\(b1)")
     
-    var result = [Double](count:rows1, repeatedValue:0.0)
+    var result = [Double](repeating:0.0, count:rows1)
     
     for i in 0..<columns{
         for j in 0..<rows1{
@@ -298,7 +299,7 @@ func gauss(a:Matrix)->[Double]{
     
     var c: Double
     var x: [Double]
-    x = Array(count: rows, repeatedValue: 0.0)
+    x = Array(repeating: 0.0, count: rows)
     
     // loop for the generation of upper triangular matrix
     /*
@@ -372,7 +373,7 @@ func gauss(a:Matrix)->[Double]{
 func max (a: Vector) -> Double {
     //Vector maximum magnitude; double precision.
     var result = 0.0
-    var aa=[Double](count:a.rows, repeatedValue:0.0)
+    var aa=[Double](repeating:0.0, count:a.rows)
     for i in 0..<a.rows{
         aa[i]=a[i]
     }
