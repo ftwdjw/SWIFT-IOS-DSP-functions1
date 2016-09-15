@@ -179,6 +179,16 @@ func dotProduct (a: [Double], b: [Double]) -> Double {
 }
 
 
+func scalarProduct (a: [Double], b: Double) -> [Double] {
+    //Computes the scalar product of vectors A and scalar B and leaves the result in output vector; double precision.
+    var bb=b
+    var result = [Double](repeating:0.0, count: a.count)
+    
+    //vDSP_dotprD(a, 1, b, 1, &result, UInt(a.count))
+    vDSP_vsmulD(a, 1, &bb, &result, 1, UInt(a.count))
+    return result
+}
+
 func transpose (a: Matrix ) -> [Double] {
     //Creates a transposed matrix C from a source matrix A; double precision.
     let rows=a.rows
@@ -289,86 +299,6 @@ func mvmul (a: Matrix, b: Vector) -> [Double]{
     return result
 }
 
-func gauss(a:Matrix)->[Double]{
-    //gauss elimination to solve linear equation
-    let rows=a.rows
-    let columns=a.columns
-    var A=Matrix(rows: rows, columns: columns)
-    A=a
-    var n=rows
-    
-    var c: Double
-    var x: [Double]
-    x = Array(repeating: 0.0, count: rows)
-    
-    // loop for the generation of upper triangular matrix
-    /*
-     
-     for(j=1; j<=n; j++) /* loop for the generation of upper triangular matrix*/
-     {
-     for(i=1; i<=n; i++)
-     {
-     if(i>j)
-     {
-     c=A[i][j]/A[j][j];
-     for(k=1; k<=n+1; k++)
-     {
-     A[i][k]=A[i][k]-c*A[j][k];
-     }
-     }
-     }
-     }
-     
-     */
-    // loop for the generation of upper triangular matrix
-    //print("\(A)")
-    for j in 0..<n{
-        for i in 0..<n{
-            if i>j{
-                c=A[i,j]/A[j,j]
-                for k in 0..<n+1{
-                    A[i,k] -= c*A[j,k]
-                    //print("A[\(i),\(k)]=\(A[i,k])")
-                }
-            }
-        }
-    }
-    
-    //print("\(A)")
-    n -= 1
-    x[n]=A[n,n+1]/A[n,n]
-    //print("x[\(n)]=\(x[n])")
-    
-    var sum=0.0
-    /* this loop is for backward substitution
-     for(i=n-1; i>=1; i--)
-     {
-     sum=0;
-     for(j=i+1; j<=n; j++)
-     {
-     sum=sum+A[i][j]*x[j];
-     }
-     x[i]=(A[i][n+1]-sum)/A[i][i];
-     }
-     */
-    var i :Int
-    
-    for(i=n-1; i>=0; i -= 1){
-        print("i=/(i)")
-        sum=0.0
-        
-        for j in i+1..<rows{
-            sum += A[i,j]*x[j]
-            //print("sum[\(j)]=\(sum)")
-            
-        }
-        x[i]=(A[i,n+1]-sum)/A[i,i]
-        //print("x[\(n)]=\(x[n])")
-        
-    }
-    return x
-    
-}
 
 func max (a: Vector) -> Double {
     //Vector maximum magnitude; double precision.
